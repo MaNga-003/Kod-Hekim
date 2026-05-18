@@ -37,6 +37,9 @@ packages = ["."]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+markers = [
+    "network: gerçek ağ erişimi gerektiren testler (opt-in)",
+]
 
 [tool.ruff]
 line-length = 100
