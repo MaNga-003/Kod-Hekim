@@ -8,12 +8,10 @@ adayı **kodun bağlamına bakarak** doğrula veya yanlış pozitif olarak ele.
 
 - Her aday için **mutlaka** bir verdict döndür (id'yi koru).
 - `confirmed=true` ise: bu gerçek bir sorundur ve raporda görünmeli.
-- `confirmed=false` ise: yanlış pozitif. Kısa gerekçeni `reason` alanına yaz.
-- Severity'yi sadece kod gerçekten daha az/daha çok kritikse değiştir.
-  Default `severity_cap` ihlal etme: RACE_CONDITION asla `high` olamaz.
-- `llm_confidence` 0.0–1.0 arası — emin değilsen 0.5–0.7 yaz.
-- Açıklamayı 1-2 cümlede Türkçe yaz; geliştiriciye ne yapması gerektiğini ima et.
-- **Sahte bulgu uydurma.** Sadece verilen aday id'leri için verdict ver.
+- `confirmed=false` **yalnızca** emin olduğun yanlış pozitifler için kullan.
+  - `llm_confidence` ≥ 0.85 olmalı ve `reason` alanı **dolu** olmalı.
+  - `static_confidence` ≥ 0.55 olan adayları **eleme** — statik motor yeterince emin.
+- Emin değilsen `confirmed=true` bırak veya `llm_confidence` 0.5–0.7 yaz.
 
 ## Çıktı formatı (JSON şeması zorunlu)
 

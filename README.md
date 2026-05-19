@@ -21,7 +21,7 @@
 
 ## ⚡ Hızlı Bakış
 
-KodHekim, GitHub repo URL'sini alıp **4 AI ajan ekibi** ile 22 farklı pahalı/riskli
+KodHekim, GitHub repo URL'sini alıp **4 AI ajan ekibi** ile 23 farklı pahalı/riskli
 kod örüntüsünü tespit eder, teknik etkisini sayısal ölçer, unified diff formatında
 düzeltme önerir ve yazdırılabilir bir kod sağlığı raporu üretir.
 
@@ -57,7 +57,7 @@ Düzeltme efor tahmini: ~9 geliştirici saati
 
 | Ajan | Karakter | Görev |
 |---|---|---|
-| 🔍 Profiler | **Dr. Müfettiş** | 22 örüntüyü statik kural motoruyla + LLM confirm ile bulur |
+| 🔍 Profiler | **Dr. Müfettiş** | 23 örüntüyü statik kural motoruyla + LLM confirm ile bulur (Python, JS, TS) |
 | 📊 Impact Analyst | **Dr. Ölçücü** | Sorunların teknik etkisini sayısal ölçer (ekstra sorgu, peak RAM, latency) |
 | 🩹 Surgeon | **Dr. Cerrah** | Her sorun için unified diff düzeltme + risk + test önerisi üretir |
 | ⚕️ Chief | **Dr. Hekimbaşı** | Tüm bulguları toplar, sağlık skoru hesaplar, yönetici özeti yazar |
@@ -70,13 +70,15 @@ Düzeltme efor tahmini: ~9 geliştirici saati
 | **Hibrit** *(default)* | ⚡⚡ | Kural + LLM confirm + ajan pipeline | Günlük kullanım |
 | **Derin** | ⚡ | AST özeti + tam kod LLM'e direkt | Beklenmedik örüntüler için, küçük-orta repo |
 
-## 🔍 22 Tespit Edilen Örüntü
+## 🔍 23 Tespit Edilen Örüntü
+
+**Diller:** Python · JavaScript · TypeScript
 
 ### Performans (8)
 `N1_QUERY` · `SYNC_IN_ASYNC` · `MISSING_INDEX_HINT` · `O_N_SQUARED` · `LARGE_PAYLOAD` · `REPEATED_COMPUTE` · `OVERFETCH_COLUMNS` · `MISSING_TIMEOUT`
 
 ### Bellek/RAM (5)
-`UNCLOSED_RESOURCE` · `UNBOUNDED_CACHE` · `GLOBAL_ACCUMULATOR` · `LIST_OVER_GENERATOR` · `LOAD_FULL_FILE`
+`MEMORY_LEAK_LISTENER` · `UNCLOSED_RESOURCE` · `UNBOUNDED_CACHE` · `GLOBAL_ACCUMULATOR` · `LIST_OVER_GENERATOR` · `LOAD_FULL_FILE`
 
 ### Güvenilirlik (4)
 `UNHANDLED_EXCEPTION` · `RACE_CONDITION` · `DEEP_RECURSION` · `MUTABLE_DEFAULT_ARG`
@@ -84,17 +86,15 @@ Düzeltme efor tahmini: ~9 geliştirici saati
 ### Güvenlik (1) — *raporda ayrı bölüm*
 `HARDCODED_SECRET` (AWS, Stripe, GitHub, JWT, connection string, generic key)
 
-### Kalite (4)
+### Kalite (5)
 `INEFFICIENT_STRING_CONCAT` · `CIRCULAR_IMPORT` · `SHADOW_VARIABLE` · `DEAD_CODE`
-
-> MVP yalnız **Python**. JS/TS sonraki sürüme bırakıldı.
 
 ## 🛠️ Teknolojiler
 
 **Frontend:** Next.js 14 (App Router) · React · TailwindCSS · TypeScript
 **Backend:** FastAPI · Python 3.11 · LangGraph · SSE (server-sent events)
 **LLM:** Cerebras Cloud SDK (gpt-oss-120b, qwen, llama, glm-4.7) · Google Gemini (2.5 Pro/Flash)
-**Analiz:** `ast` (stdlib) · tree-sitter-python · unidiff · gitpython
+**Analiz:** `ast` (stdlib) · tree-sitter-python · tree-sitter-javascript · tree-sitter-typescript · gitpython
 
 ## 🏗️ Mimari
 
@@ -103,7 +103,7 @@ flowchart LR
     User([👤]) --> FE[Next.js 14]
     FE -->|POST /api/analyze| BE[FastAPI]
     BE -.->|SSE| FE
-    BE --> Static[22 statik kural]
+    BE --> Static[23 statik kural · 3 dil]
     BE --> Pipeline[4 Ajan<br/>LangGraph]
     Pipeline --> Cerebras[Cerebras]
     Pipeline --> Gemini[Gemini]
@@ -156,7 +156,7 @@ Kod-Hekim/
 ├── backend/          # FastAPI
 │   ├── api/          # analyze, stream, report, models, badge
 │   ├── agents/       # profiler, impact, surgeon, chief, orchestrator
-│   ├── analysis/     # static_rules/ (22 plugin), scan, ast_parser, repo_cloner
+│   ├── analysis/     # static_rules/ (23 örüntü), scan, ast_parser, js_ts_scan, repo_cloner
 │   ├── llm/          # cerebras_provider, gemini_provider, registry
 │   └── prompts/      # ajan başına Türkçe prompt'lar
 ├── docs/             # pitch, architecture, screenshots, logo

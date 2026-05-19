@@ -24,7 +24,7 @@ Kullanıcı GitHub repo URL'sini yapıştırır. KodHekim'in **4 AI ajanı** iş
 
 | Ajan | Karakter | Görev |
 |---|---|---|
-| 🔍 Profiler | **Dr. Müfettiş** | 22 örüntüyü statik + LLM ile bulur |
+| 🔍 Profiler | **Dr. Müfettiş** | 23 örüntüyü statik + LLM ile bulur (Python, JS, TS) |
 | 📊 Impact Analyst | **Dr. Ölçücü** | Teknik etkiyi sayısal ölçer (ekstra sorgu, peak RAM, latency) |
 | 🩹 Surgeon | **Dr. Cerrah** | Her sorun için unified diff düzeltme önerir |
 | ⚕️ Chief | **Dr. Hekimbaşı** | Tüm bulguları toplayıp yönetici raporu yazar |

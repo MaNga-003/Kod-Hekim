@@ -39,6 +39,20 @@ class TestN1Query:
         src = "u = User.objects.get(pk=1)\n"
         assert run_rule(self.rule, src) == []
 
+    def test_negative_dict_get_in_loop(self) -> None:
+        src = (
+            "for i in issues:\n"
+            "    imp = impacts_by_id.get(i.id)\n"
+        )
+        assert run_rule(self.rule, src) == []
+
+    def test_negative_client_get_in_loop(self) -> None:
+        src = (
+            "while True:\n"
+            "    r = client.get('/status')\n"
+        )
+        assert run_rule(self.rule, src) == []
+
 
 # ---------------------------------------------------------------------------
 # LARGE_PAYLOAD

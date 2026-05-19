@@ -1,0 +1,18 @@
+{
+  "issue": {
+    "code": "MISSING_TIMEOUT",
+    "file": "src/services/payment.py",
+    "line_start": 12,
+    "line_end": 14,
+    "severity": "high",
+    "explanation": "requests.get çağrısı timeout kwarg'ı olmadan — yavaş upstream pool'u tüketebilir.",
+    "impact_summary": "Connection pool tükenme riski yüksek (4/5). Yavaş downstream cascade failure tetikleyebilir."
+  },
+  "code_window": "def fetch_status(order_id: str) -> dict:\n    r = requests.get(f'https://payments.internal/orders/{order_id}')\n    r.raise_for_status()\n    return r.json()",
+  "response": {
+    "fix_instruction_tr": "1. Kök neden: HTTP isteği süresiz bekleyebilir; pool tükenebilir.\n2. requests.get çağrısına timeout=(connect, read) ekle (ör. timeout=5.0).\n3. ConnectTimeout ve ReadTimeout için ayrı hata yönetimi tanımla.\n4. Retry politikası gerekiyorsa exponential backoff ile sınırla.\n5. Yavaş upstream senaryosunu mock'layan birim testi yaz.",
+    "risk_level": 1,
+    "test_suggestion": "responses kütüphanesi ile yavaş upstream simüle et, fonksiyon 5s sonrası ConnectTimeout fırlatmalı.",
+    "improvement_estimate": "Pool tükenme süresi sınırsız → 5s ile bound; cascade failure riski belirgin biçimde azalır."
+  }
+}
