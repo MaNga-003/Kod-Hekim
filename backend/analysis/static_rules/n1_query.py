@@ -5,34 +5,67 @@ from __future__ import annotations
 import ast
 
 from analysis.ast_parser import ParsedFile, snippet_for
-from analysis.static_rules.base import IssueCandidate, StaticRule, build_parent_map, is_in_loop
+from analysis.static_rules.base import (
+    IssueCandidate,
+    StaticRule,
+    build_parent_map,
+    get_attr_chain,
+    is_in_loop,
+)
 
 
-# Çağrıda görünen son attribute (zincirin sonu). Geniş tutuyoruz; LLM confirm filtreler.
-_ORM_METHOD_NAMES = {
+# Doğrudan sorgu nesnesi üzerinde — tek başına yeterince güvenilir
+_DIRECT_ORM_METHODS = frozenset({
     "query",
     "filter",
     "filter_by",
     "where",
+    "execute",
+    "objects",
+})
+
+# Yalnızca ORM bağlamında (`.query.get`, `.objects.get`, `session.get`) sayılır
+_CONTEXT_ORM_METHODS = frozenset({
     "get",
     "first",
     "one",
     "one_or_none",
     "find",
     "find_one",
-    "execute",
-    # Django: Model.objects.get/.filter
+})
+
+_ORM_RECEIVER_HINTS = frozenset({
+    "query",
     "objects",
-}
+    "session",
+    "db",
+})
+
+
+def _chain_looks_like_orm(chain: str) -> bool:
+    parts = chain.split(".")
+    if len(parts) < 2:
+        return False
+    receiver = parts[-2].lower()
+    if receiver in _ORM_RECEIVER_HINTS:
+        return True
+    if receiver.endswith("session"):
+        return True
+    # Model.query.filter — en az üç parça
+    return len(parts) >= 3 and parts[-3].lower() not in {"self", "cls"}
 
 
 def _is_db_call(call: ast.Call) -> str | None:
-    """Çağrı muhtemelen DB call mı? Eşleşen method adını döndür ya da None."""
+    """Çağrı muhtemelen DB/ORM call mı? dict.get / client.get gibi FP'leri ele."""
     if not isinstance(call.func, ast.Attribute):
         return None
     method = call.func.attr
-    if method in _ORM_METHOD_NAMES:
+    if method in _DIRECT_ORM_METHODS:
         return method
+    if method in _CONTEXT_ORM_METHODS:
+        chain = get_attr_chain(call.func)
+        if chain and _chain_looks_like_orm(chain):
+            return method
     return None
 
 
