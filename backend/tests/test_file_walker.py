@@ -6,12 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from analysis.file_walker import (
-    EXCLUDED_DIR_NAMES,
-    LANGUAGE_EXTENSIONS,
-    detect_languages,
-    walk_files,
-)
+from analysis.file_walker import EXCLUDED_DIR_NAMES, detect_languages, walk_files
+from analysis.languages import LANGUAGE_EXTENSIONS
 
 
 # ---------------------------------------------------------------------------
@@ -70,12 +66,13 @@ def test_walk_files_excludes_dotdirs(tmp_path: Path) -> None:
     assert [r.rel_path for r in results] == ["ok.py"]
 
 
-def test_walk_files_sorts_by_size_desc(tmp_path: Path) -> None:
+def test_walk_files_prioritizes_smaller_sources(tmp_path: Path) -> None:
     _make_file(tmp_path, "small.py", "x\n")  # 2 byte
     _make_file(tmp_path, "big.py", "x" * 5000)  # 5000 byte
     _make_file(tmp_path, "medium.py", "x" * 500)  # 500 byte
     results = walk_files(tmp_path)
-    assert [r.rel_path for r in results] == ["big.py", "medium.py", "small.py"]
+    # Küçük dosyalar önce — cap dolunca daha fazla kaynak dosyası sığar
+    assert [r.rel_path for r in results] == ["small.py", "medium.py", "big.py"]
 
 
 def test_walk_files_respects_max(tmp_path: Path) -> None:
@@ -83,8 +80,8 @@ def test_walk_files_respects_max(tmp_path: Path) -> None:
         _make_file(tmp_path, f"f{i}.py", "x" * (i + 1))
     results = walk_files(tmp_path, max_files=3)
     assert len(results) == 3
-    # En büyükler (i=9,8,7) tutulmalı
-    assert {r.rel_path for r in results} == {"f9.py", "f8.py", "f7.py"}
+    # En küçükler (i=0,1,2) tutulmalı
+    assert {r.rel_path for r in results} == {"f0.py", "f1.py", "f2.py"}
 
 
 def test_walk_files_rejects_nonexistent_path(tmp_path: Path) -> None:
@@ -99,6 +96,17 @@ def test_detect_languages_finds_python(fake_repo: Path) -> None:
 
 def test_detect_languages_empty_repo(tmp_path: Path) -> None:
     assert detect_languages(tmp_path) == []
+
+
+def test_walk_files_excludes_test_fixtures(tmp_path: Path) -> None:
+    _make_file(tmp_path, "app/main.py", "x = 1\n")
+    _make_file(tmp_path, "tests/fixtures/bad_code/api.py", "SECRET = 'x'\n")
+    _make_file(tmp_path, "tests/test_main.py", "def test_x(): pass\n")
+    results = walk_files(tmp_path)
+    rels = {r.rel_path for r in results}
+    assert "app/main.py" in rels
+    assert "tests/test_main.py" in rels
+    assert "tests/fixtures/bad_code/api.py" not in rels
 
 
 def test_language_extensions_registry_has_python() -> None:

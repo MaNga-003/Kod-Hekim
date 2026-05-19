@@ -14,6 +14,7 @@ from llm.base import (
     LLMResponseError,
 )
 from llm.safe_json import safe_json_parse
+from llm.timeout import run_with_timeout
 
 
 AVAILABLE_MODELS: list[str] = [
@@ -77,7 +78,10 @@ class GeminiProvider(LLMProvider):
         for attempt in range(len(delays) + 1):
             try:
                 start = time.monotonic()
-                resp = m.generate_content(prompt, generation_config=config)
+                resp = run_with_timeout(
+                    lambda: m.generate_content(prompt, generation_config=config),
+                    label=f"Gemini {model}",
+                )
                 latency_ms = int((time.monotonic() - start) * 1000)
                 break
             except Exception as e:

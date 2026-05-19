@@ -87,6 +87,7 @@ def test_clone_raises_when_size_exceeds_limit(tmp_path: Path) -> None:
 
     def fake_clone(url, target, **kwargs):  # type: ignore[no-untyped-def]
         Path(target).mkdir(parents=True, exist_ok=True)
+        (Path(target) / ".git").mkdir()
         big = Path(target) / "big.bin"
         big.write_bytes(b"x" * (2 * 1024 * 1024))  # 2 MB
 
@@ -113,6 +114,7 @@ def test_clone_raises_when_size_exceeds_limit(tmp_path: Path) -> None:
 def test_clone_success_returns_result(tmp_path: Path) -> None:
     def fake_clone(url, target, **kwargs):  # type: ignore[no-untyped-def]
         Path(target).mkdir(parents=True, exist_ok=True)
+        (Path(target) / ".git").mkdir()
         (Path(target) / "main.py").write_text("print('ok')\n")
 
         class _FakeRepo:
@@ -160,14 +162,16 @@ def test_cleanup_silent_on_missing(tmp_path: Path) -> None:
 
 @pytest.mark.network
 def test_real_clone_octocat(tmp_path: Path) -> None:
-    """Klasik küçücük public repo: github.com/octocat/Hello-World (<1 KB)."""
+    """Küçük public repo — kaynak dosyası olan (Flask src/)."""
     result = clone_repo(
-        "https://github.com/octocat/Hello-World",
+        "https://github.com/pallets/flask",
         tmp_dir=tmp_path,
+        job_id="octocat-test",
     )
     try:
         assert result.repo_path.exists()
         assert result.commit_sha != "unknown"
-        assert result.size_mb < 5
+        assert result.source_file_count > 0
+        assert result.size_mb < 100
     finally:
         cleanup(result.repo_path)

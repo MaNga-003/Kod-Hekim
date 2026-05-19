@@ -1,0 +1,18 @@
+{
+  "issue": {
+    "code": "N1_QUERY",
+    "file": "src/api/users.py",
+    "line_start": 47,
+    "line_end": 53,
+    "severity": "high",
+    "explanation": "Döngü içinde DB sorgusu — her kullanıcı için ayrı çağrı.",
+    "impact_summary": "Tipik bir istekte ~50 ekstra DB çağrısı. p99 latency 850ms → ~150ms beklenir."
+  },
+  "code_window": "@app.get('/users/feed')\ndef list_feed(users):\n    result = []\n    for u in users:\n        posts = Post.query.filter_by(user_id=u.id).all()\n        result.append({'user': u.id, 'posts': posts})\n    return result",
+  "response": {
+    "fix_instruction_tr": "1. Kök neden: Her kullanıcı için döngü içinde ayrı sorgu açılıyor (N+1).\n2. Tüm user_id değerlerini tek listede topla.\n3. Post'ları tek batch sorgu ile çek (IN (...) veya joinedload/selectinload).\n4. Sonuçları bellekte user_id'ye göre grupla ve yanıtı oluştur.\n5. Endpoint için assertNumQueries(1) integration testi ekle.",
+    "risk_level": 2,
+    "test_suggestion": "assertNumQueries(1) ile listenin tek sorguda döndüğünü doğrula.",
+    "improvement_estimate": "Yanıt süresi 850ms → ~150ms (~%82 hızlanma)."
+  }
+}

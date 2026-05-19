@@ -103,7 +103,7 @@ class StaticRule(_RuleBase, ABC):
         category: kategori string'i.
         severity: varsayılan severity.
         severity_cap: severity tavanı (varsa). developer.md §5.3 RACE_CONDITION için "medium".
-        languages: desteklenen diller. MVP'de hep ["python"].
+        languages: desteklenen diller (ör. ["python"], ["javascript", "typescript"], üçü birden).
     """
 
     @abstractmethod

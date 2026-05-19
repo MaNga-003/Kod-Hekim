@@ -86,7 +86,7 @@ sequenceDiagram
 | `backend/analysis/repo_cloner.py` | Shallow clone, boyut/private guard |
 | `backend/analysis/file_walker.py` | Uzantı filtresi, exclude dizinler |
 | `backend/analysis/ast_parser.py` | `ast.parse` sarıcısı |
-| `backend/analysis/static_rules/` | 22 örüntü plugin (her biri ayrı dosya) |
+| `backend/analysis/static_rules/` | 23 örüntü plugin · Python `ast` + Tree-sitter (JS/TS) |
 | `backend/analysis/scan.py` | Tüm kuralları sıraya sok, IssueCandidate listesi |
 | `backend/llm/` | Cerebras + Gemini soyutlaması (TypedDict response) |
 | `backend/agents/` | 4 ajan + orchestrator (LangGraph) |
