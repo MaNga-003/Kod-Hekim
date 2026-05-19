@@ -17,6 +17,7 @@ from llm.base import (
 )
 from llm.gemini_schema import sanitize_json_schema_for_gemini
 from llm.safe_json import safe_json_parse
+from llm.timeout import run_with_timeout
 
 
 AVAILABLE_MODELS: list[str] = [
