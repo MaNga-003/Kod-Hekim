@@ -53,7 +53,7 @@ CONFIRM_SCHEMA: dict = {
                     },
                     "llm_confidence": {"type": "number"},
                     "explanation": {"type": "string"},
-                    "reason": {"type": ["string", "null"]},
+                    "reason": {"type": "string"},
                 },
                 "required": ["id", "confirmed", "llm_confidence"],
             },

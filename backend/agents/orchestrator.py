@@ -125,9 +125,13 @@ def run_pipeline(
     }
 
     if provider is None and mode != "static":
+        from llm.base import LLMError  # noqa: WPS433
         from llm.registry import get_provider  # noqa: WPS433
 
-        provider = get_provider(provider_name)
+        try:
+            provider = get_provider(provider_name)
+        except LLMError as e:
+            raise RuntimeError(str(e)) from e
 
     models = resolve_models(provider_name, model_overrides)
 

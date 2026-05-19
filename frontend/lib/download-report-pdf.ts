@@ -5,9 +5,10 @@ import type {
   ReportPayload,
   SimulateResponse,
 } from "./api-client";
+import { downloadHtmlAsPdf } from "./download-pdf";
 import { buildPrintDocument, type PrintReportResult } from "./print-report";
 
-/** Butona basıldığında PDF oluşturur ve otomatik indirir — yalnızca tarayıcıda. */
+/** Butona basıldığında PDF oluşturur ve otomatik indirir. */
 export async function downloadReportPdf(
   data: ReportPayload,
   opts?: {
@@ -28,22 +29,10 @@ export async function downloadReportPdf(
   const html = buildPrintDocument(data, { ...opts, forExport: true });
 
   try {
-    const { downloadHtmlAsPdf } = await import("./download-pdf");
     await downloadHtmlAsPdf(html, filename);
     return { ok: true, message: `${filename} indirildi.` };
   } catch (err) {
-    try {
-      const { openPrintFallback } = await import("./download-pdf");
-      openPrintFallback(html);
-      return {
-        ok: true,
-        message: "PDF oluşturulamadı; yazdırma penceresi açıldı — «PDF olarak kaydet» seçin.",
-      };
-    } catch (fallbackErr) {
-      return {
-        ok: false,
-        message: (fallbackErr as Error).message || (err as Error).message || "PDF oluşturulamadı.",
-      };
-    }
+    const msg = (err as Error).message || "PDF oluşturulamadı.";
+    return { ok: false, message: msg };
   }
 }

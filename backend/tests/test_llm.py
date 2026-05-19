@@ -235,14 +235,33 @@ def _fake_genai_module(response_text="ok", tokens=5, raise_exc=None):
 
 
 class TestGeminiProvider:
-    def _install(self, monkeypatch, **kwargs):
+    def _mock_response(self, monkeypatch, *, status: int = 200, body: dict | None = None, text: str = "ok", tokens: int = 5):
         monkeypatch.setenv("GEMINI_API_KEY", "fake-key")
-        google_mod = SimpleNamespace(generativeai=_fake_genai_module(**kwargs))
-        monkeypatch.setitem(sys.modules, "google", google_mod)
-        monkeypatch.setitem(sys.modules, "google.generativeai", google_mod.generativeai)
+        payload = body or {
+            "candidates": [{"content": {"parts": [{"text": text}]}}],
+            "usageMetadata": {"totalTokenCount": tokens},
+        }
+
+        class FakeResp:
+            status_code = status
+            def json(self):
+                return payload
+            text = str(payload)
+
+        class FakeClient:
+            def __init__(self, *a, **k):
+                pass
+            def __enter__(self):
+                return self
+            def __exit__(self, *a):
+                return False
+            def post(self, url, params=None, json=None):
+                return FakeResp()
+
+        monkeypatch.setattr("llm.gemini_provider.httpx.Client", FakeClient)
 
     def test_plain_complete(self, monkeypatch) -> None:
-        self._install(monkeypatch, response_text="merhaba", tokens=8)
+        self._mock_response(monkeypatch, text="merhaba", tokens=8)
         from llm.gemini_provider import GeminiProvider
 
         p = GeminiProvider()
@@ -252,7 +271,7 @@ class TestGeminiProvider:
         assert resp["json"] is None
 
     def test_json_complete(self, monkeypatch) -> None:
-        self._install(monkeypatch, response_text='{"k": 1}')
+        self._mock_response(monkeypatch, text='{"k": 1}')
         from llm.gemini_provider import GeminiProvider
 
         p = GeminiProvider()
@@ -261,9 +280,6 @@ class TestGeminiProvider:
 
     def test_missing_api_key_raises(self, monkeypatch) -> None:
         monkeypatch.delenv("GEMINI_API_KEY", raising=False)
-        google_mod = SimpleNamespace(generativeai=_fake_genai_module())
-        monkeypatch.setitem(sys.modules, "google", google_mod)
-        monkeypatch.setitem(sys.modules, "google.generativeai", google_mod.generativeai)
         from llm.gemini_provider import GeminiProvider
 
         with pytest.raises(LLMError):
@@ -271,36 +287,36 @@ class TestGeminiProvider:
 
     def test_rate_limit_retries_then_raises(self, monkeypatch) -> None:
         monkeypatch.setattr("llm.gemini_provider.time.sleep", lambda *_: None)
-        self._install(monkeypatch, raise_exc=RuntimeError("HTTP 429: quota exhausted"))
+        calls = {"n": 0}
+
+        class RateResp:
+            status_code = 429
+            text = "quota exhausted"
+            def json(self):
+                return {"error": {"message": "quota exhausted"}}
+
+        class FakeClient:
+            def __init__(self, *a, **k):
+                pass
+            def __enter__(self):
+                return self
+            def __exit__(self, *a):
+                return False
+            def post(self, url, params=None, json=None):
+                calls["n"] += 1
+                return RateResp()
+
+        monkeypatch.setenv("GEMINI_API_KEY", "fake-key")
+        monkeypatch.setattr("llm.gemini_provider.httpx.Client", FakeClient)
         from llm.gemini_provider import GeminiProvider
 
         p = GeminiProvider()
         with pytest.raises(LLMRateLimitError):
             p.complete("x", model="gemini-2.5-flash")
+        assert calls["n"] >= 1
 
-    def test_text_unreadable_raises_response_error(self, monkeypatch) -> None:
-        """Safety filter durumunda `resp.text` raise eder."""
-
-        def bad_gen(prompt, generation_config=None):
-            class Bad:
-                @property
-                def text(self):
-                    raise ValueError("blocked by safety")
-
-                usage_metadata = SimpleNamespace(total_token_count=0)
-
-            return Bad()
-
-        monkeypatch.setenv("GEMINI_API_KEY", "fake-key")
-        genai_mod = _fake_genai_module()
-        # GenerativeModel'i bypassla
-        genai_mod.GenerativeModel = lambda name, **kw: SimpleNamespace(
-            generate_content=bad_gen
-        )
-        google_mod = SimpleNamespace(generativeai=genai_mod)
-        monkeypatch.setitem(sys.modules, "google", google_mod)
-        monkeypatch.setitem(sys.modules, "google.generativeai", genai_mod)
-
+    def test_empty_candidate_raises_response_error(self, monkeypatch) -> None:
+        self._mock_response(monkeypatch, body={"candidates": []})
         from llm.gemini_provider import GeminiProvider
 
         p = GeminiProvider()
