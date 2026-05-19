@@ -30,7 +30,11 @@ def _allowed_origins() -> list[str]:
     raw = os.getenv("CORS_ALLOWED_ORIGINS")
     if raw:
         return [o.strip() for o in raw.split(",") if o.strip()]
-    return ["http://localhost:3000", "http://127.0.0.1:3000"]
+    return [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://frontend-production-5646.up.railway.app",
+    ]
 
 
 app.add_middleware(
