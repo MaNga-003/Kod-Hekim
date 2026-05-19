@@ -47,6 +47,10 @@ export default function LandingPage() {
   const onStart = async () => {
     setErr("");
     if (!url.trim()) { setErr("GitHub URL gerekli."); return; }
+    if (mode !== "static" && !providerAvailable) {
+      setErr(`${provider.toUpperCase()}_API_KEY ayarlanmamış — backend .env dosyasını kontrol edin veya Statik mod seçin.`);
+      return;
+    }
     setLoading(true);
     try {
       const cleanOverrides = Object.fromEntries(Object.entries(overrides).filter(([, v]) => Boolean(v)));
@@ -64,7 +68,9 @@ export default function LandingPage() {
 
   const providerModels = models?.providers[provider]?.models ?? [];
   const providerDefaults = models?.providers[provider]?.defaults ?? {};
-  const providerAvailable = models?.providers[provider]?.available ?? true;
+  const providerAvailable = models?.providers[provider]?.available ?? false;
+  const needsLlm = mode !== "static";
+  const canStart = !needsLlm || providerAvailable;
 
   return (
     <main className="min-h-screen flex flex-col items-center hero-gradient grid-pattern">
@@ -240,7 +246,7 @@ export default function LandingPage() {
             type="button"
             id="start-analysis-btn"
             onClick={onStart}
-            disabled={loading || !url.trim()}
+            disabled={loading || !url.trim() || !canStart}
             className="btn-primary mt-6 w-full py-3.5 text-sm flex items-center justify-center gap-2"
           >
             {loading ? (

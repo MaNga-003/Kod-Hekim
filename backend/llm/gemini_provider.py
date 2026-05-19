@@ -1,10 +1,12 @@
-"""Google Gemini SDK üzerinden LLM sağlayıcısı (developer.md §2.3)."""
+"""Google Gemini REST API üzerinden LLM sağlayıcısı (grpc SDK yok — Windows uyumlu)."""
 
 from __future__ import annotations
 
 import os
 import time
-from typing import Optional
+from typing import Any, Optional
+
+import httpx
 
 from llm.base import (
     LLMError,
@@ -13,41 +15,110 @@ from llm.base import (
     LLMResponse,
     LLMResponseError,
 )
+from llm.gemini_schema import sanitize_json_schema_for_gemini
 from llm.safe_json import safe_json_parse
-from llm.timeout import run_with_timeout
 
 
 AVAILABLE_MODELS: list[str] = [
     "gemini-2.5-pro",
     "gemini-2.5-flash",
+    "gemini-2.0-flash",
 ]
 
+_API_BASE = "https://generativelanguage.googleapis.com/v1beta"
 
-def _is_rate_limit(exc: Exception) -> bool:
-    msg = str(exc).lower()
-    return (
-        "rate" in msg
-        or "429" in msg
-        or "resource" in msg and "exhausted" in msg
-        or "quota" in msg
-    )
+
+def _normalize_model(model: str) -> str:
+    return model if model.startswith("models/") else f"models/{model}"
+
+
+def _is_rate_limit(status: int, msg: str) -> bool:
+    if status == 429:
+        return True
+    low = msg.lower()
+    return "rate" in low or "quota" in low or "resource exhausted" in low
+
+
+def _extract_text(data: dict) -> str:
+    candidates = data.get("candidates") or []
+    if not candidates:
+        block = (data.get("promptFeedback") or {}).get("blockReason")
+        if block:
+            raise LLMResponseError(f"Gemini istek engellendi: {block}")
+        raise LLMResponseError("Gemini boş yanıt döndürdü.")
+
+    content = candidates[0].get("content") or {}
+    parts = content.get("parts") or []
+    texts = [p.get("text", "") for p in parts if isinstance(p, dict) and p.get("text")]
+    text = "".join(texts).strip()
+    if not text:
+        finish = candidates[0].get("finishReason")
+        raise LLMResponseError(f"Gemini yanıt metni yok (finishReason={finish}).")
+    return text
 
 
 class GeminiProvider(LLMProvider):
     name = "gemini"
 
     def __init__(self, api_key: Optional[str] = None) -> None:
-        # Lazy import — test izolasyonu için
-        import google.generativeai as genai  # type: ignore[import-untyped]
-
         key = api_key or os.getenv("GEMINI_API_KEY")
         if not key:
             raise LLMError("GEMINI_API_KEY .env içinde tanımlı değil.")
-        genai.configure(api_key=key)
-        self._genai = genai
+        self._api_key = key
+        try:
+            timeout = float(os.getenv("LLM_REQUEST_TIMEOUT_SEC", "90"))
+        except ValueError:
+            timeout = 90.0
+        self._timeout = timeout
 
     def list_models(self) -> list[str]:
         return list(AVAILABLE_MODELS)
+
+    def _request(
+        self,
+        model: str,
+        body: dict[str, Any],
+    ) -> dict[str, Any]:
+        url = f"{_API_BASE}/{_normalize_model(model)}:generateContent"
+        with httpx.Client(timeout=self._timeout) as client:
+            resp = client.post(url, params={"key": self._api_key}, json=body)
+        if resp.status_code >= 400:
+            detail = resp.text[:500]
+            try:
+                detail = resp.json().get("error", {}).get("message", detail)
+            except Exception:
+                pass
+            if _is_rate_limit(resp.status_code, str(detail)):
+                raise LLMRateLimitError(f"Gemini rate limit: {detail}")
+            raise LLMError(f"Gemini HTTP {resp.status_code}: {detail}")
+        return resp.json()
+
+    def _build_body(
+        self,
+        prompt: str,
+        *,
+        temperature: float,
+        max_tokens: int,
+        json_schema: Optional[dict],
+        system: Optional[str],
+        use_schema: bool,
+    ) -> dict[str, Any]:
+        body: dict[str, Any] = {
+            "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+            "generationConfig": {
+                "temperature": temperature,
+                "maxOutputTokens": max_tokens,
+            },
+        }
+        if system:
+            body["systemInstruction"] = {"parts": [{"text": system}]}
+        if json_schema:
+            body["generationConfig"]["responseMimeType"] = "application/json"
+            if use_schema:
+                body["generationConfig"]["responseSchema"] = sanitize_json_schema_for_gemini(
+                    json_schema
+                )
+        return body
 
     def complete(
         self,
@@ -59,59 +130,47 @@ class GeminiProvider(LLMProvider):
         max_tokens: int = 4096,
         system: Optional[str] = None,
     ) -> LLMResponse:
-        model_kwargs: dict = {}
-        if system:
-            model_kwargs["system_instruction"] = system
-
-        m = self._genai.GenerativeModel(model, **model_kwargs)
-
-        config: dict = {
-            "temperature": temperature,
-            "max_output_tokens": max_tokens,
-        }
-        if json_schema:
-            config["response_mime_type"] = "application/json"
-            config["response_schema"] = json_schema
-
-        last_exc: Optional[Exception] = None
         delays = [0.5, 1.5, 4.0]
+        last_exc: Optional[Exception] = None
+
         for attempt in range(len(delays) + 1):
-            try:
-                start = time.monotonic()
-                resp = run_with_timeout(
-                    lambda: m.generate_content(prompt, generation_config=config),
-                    label=f"Gemini {model}",
-                )
-                latency_ms = int((time.monotonic() - start) * 1000)
-                break
-            except Exception as e:
-                last_exc = e
-                if not _is_rate_limit(e):
+            for use_schema in (True, False) if json_schema else (False,):
+                try:
+                    body = self._build_body(
+                        prompt,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                        json_schema=json_schema,
+                        system=system,
+                        use_schema=use_schema,
+                    )
+                    start = time.monotonic()
+                    data = self._request(model, body)
+                    latency_ms = int((time.monotonic() - start) * 1000)
+                    text = _extract_text(data)
+                    tokens = int((data.get("usageMetadata") or {}).get("totalTokenCount") or 0)
+                    parsed_json = safe_json_parse(text) if json_schema else None
+                    return LLMResponse(
+                        text=text,
+                        json=parsed_json,
+                        tokens_used=tokens,
+                        model=model,
+                        latency_ms=latency_ms,
+                    )
+                except LLMRateLimitError:
+                    raise
+                except LLMError as e:
+                    last_exc = e
+                    # Schema reddedildiyse schema'sız JSON modunda tekrar dene
+                    if use_schema and json_schema and "schema" in str(e).lower():
+                        continue
+                    if attempt < len(delays) and _is_rate_limit(0, str(e)):
+                        time.sleep(delays[attempt])
+                        break
+                    raise
+                except LLMResponseError:
+                    raise
+                except Exception as e:
                     raise LLMError(f"Gemini complete failed: {e}") from e
-                if attempt < len(delays):
-                    time.sleep(delays[attempt])
-                    continue
-                raise LLMRateLimitError(f"Gemini rate limit, 3 retry sonrası: {e}") from e
-        else:  # pragma: no cover
-            raise LLMError(f"Beklenmedik retry akışı: {last_exc}")
 
-        try:
-            text = resp.text or ""
-        except (AttributeError, ValueError) as e:
-            # Safety filter ile blok edilmiş yanıtlar resp.text okunamaz hale getiriyor
-            raise LLMResponseError(f"Gemini yanıt metni okunamadı: {e}") from e
-
-        try:
-            tokens = int(resp.usage_metadata.total_token_count)
-        except (AttributeError, TypeError):
-            tokens = 0
-
-        parsed_json = safe_json_parse(text) if json_schema else None
-
-        return LLMResponse(
-            text=text,
-            json=parsed_json,
-            tokens_used=tokens,
-            model=model,
-            latency_ms=latency_ms,
-        )
+        raise LLMRateLimitError(f"Gemini rate limit, 3 retry sonrası: {last_exc}")

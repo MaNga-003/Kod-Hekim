@@ -264,7 +264,6 @@ export default function ReportPage() {
         </footer>
       </div>
 
-      {data && <PrintButton data={data} jobId={jobId} modeComp={modeComp} simulated={simulated} variant="fab" />}
     </main>
   );
 }

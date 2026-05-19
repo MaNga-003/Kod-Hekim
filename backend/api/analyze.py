@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from typing import Literal, Optional
 
 from fastapi import APIRouter, HTTPException
@@ -47,6 +48,17 @@ async def analyze(req: AnalyzeRequest) -> AnalyzeResponse:
     """
     if not req.repo_url.strip():
         raise HTTPException(status_code=400, detail="repo_url boş olamaz")
+
+    if req.mode != "static" and req.provider == "gemini" and not os.getenv("GEMINI_API_KEY"):
+        raise HTTPException(
+            status_code=400,
+            detail="GEMINI_API_KEY ayarlanmamış. .env dosyasına anahtarı ekleyin veya Statik mod kullanın.",
+        )
+    if req.mode != "static" and req.provider == "cerebras" and not os.getenv("CEREBRAS_API_KEY"):
+        raise HTTPException(
+            status_code=400,
+            detail="CEREBRAS_API_KEY ayarlanmamış. .env dosyasına anahtarı ekleyin veya Statik mod kullanın.",
+        )
 
     try:
         normalized = normalize_repo_url(req.repo_url.strip())
