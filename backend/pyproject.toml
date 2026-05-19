@@ -2,7 +2,6 @@
 name = "kodhekim-backend"
 version = "0.1.0"
 description = "KodHekim — kod sağlığı tanı sistemi (FastAPI backend)"
-readme = "../README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115",
