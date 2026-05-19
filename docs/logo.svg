@@ -1,30 +1,58 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="KodHekim">
-  <title>KodHekim</title>
+  <title>KodHekim — Kod Sağlığı Tanı Sistemi</title>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#0ea5e9"/>
-      <stop offset="100%" stop-color="#1e3a8a"/>
+    <linearGradient id="kh-logo-grad" x1="16" y1="112" x2="112" y2="16" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7C3AED" />
+      <stop offset="50%" stop-color="#B94FFF" />
+      <stop offset="100%" stop-color="#00F2FE" />
     </linearGradient>
-    <linearGradient id="cross" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fef3c7"/>
-      <stop offset="100%" stop-color="#fbbf24"/>
+    <linearGradient id="kh-logo-bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="rgba(185, 79, 255, 0.15)" />
+      <stop offset="100%" stop-color="rgba(124, 58, 237, 0.02)" />
     </linearGradient>
+    <filter id="kh-logo-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
   </defs>
 
-  <!-- Background card -->
-  <rect x="4" y="4" width="120" height="120" rx="24" fill="url(#bg)"/>
+  <!-- Hexagon Arkaplan -->
+  <path
+    d="M64 8 L112 36 V92 L64 120 L16 92 V36 L64 8 Z"
+    fill="url(#kh-logo-bg)"
+    stroke="#22314D"
+    stroke-width="2"
+  />
 
-  <!-- Code brackets, monospace stylized -->
-  <text x="20" y="78" font-family="JetBrains Mono, Menlo, Consolas, monospace"
-        font-size="42" font-weight="700" fill="#e0f2fe" opacity="0.55">&lt;/&gt;</text>
+  <!-- Finans Trendi & EKG Çizgisi -->
+  <path
+    d="M24 88 L44 88 L56 48 L72 96 L88 40 L104 40"
+    stroke="url(#kh-logo-grad)"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    filter="url(#kh-logo-glow)"
+  />
 
-  <!-- Medical cross overlay -->
-  <g transform="translate(72 36)">
-    <rect x="16" y="0" width="16" height="56" rx="4" fill="url(#cross)"/>
-    <rect x="0" y="20" width="48" height="16" rx="4" fill="url(#cross)"/>
+  <!-- Tıbbi Haç -->
+  <g filter="url(#kh-logo-glow)">
+    <path
+      d="M64 56 V88 M48 72 H80"
+      stroke="#B94FFF"
+      stroke-width="6"
+      stroke-linecap="round"
+      opacity="0.6"
+    />
   </g>
 
-  <!-- Heartbeat pulse line -->
-  <path d="M 14 100 L 36 100 L 44 88 L 56 110 L 68 92 L 80 104 L 90 100 L 114 100"
-        fill="none" stroke="#a7f3d0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+  <!-- Git Commit Düğümleri -->
+  <circle cx="24" cy="88" r="6" fill="#B94FFF" />
+  <circle cx="56" cy="48" r="7" fill="#7C3AED" />
+  <circle cx="72" cy="96" r="7" fill="#B94FFF" />
+  <circle cx="104" cy="40" r="8" fill="#00F2FE" />
+  
+  <circle cx="104" cy="40" r="3" fill="#FFFFFF" />
 </svg>

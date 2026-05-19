@@ -14,6 +14,7 @@ from llm.base import (
     LLMResponseError,
 )
 from llm.safe_json import safe_json_parse
+from llm.timeout import run_with_timeout
 
 
 # developer.md §2.2 — 27 Mayıs 2026'da deprecate olacak modeller MVP boyunca çalışır.
@@ -87,7 +88,10 @@ class CerebrasProvider(LLMProvider):
         for attempt in range(len(delays) + 1):
             try:
                 start = time.monotonic()
-                resp = self.client.chat.completions.create(**kwargs)
+                resp = run_with_timeout(
+                    lambda: self.client.chat.completions.create(**kwargs),
+                    label=f"Cerebras {model}",
+                )
                 latency_ms = int((time.monotonic() - start) * 1000)
                 break
             except Exception as e:

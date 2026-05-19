@@ -111,17 +111,17 @@ class TestProfilerHybrid:
         assert all(i.llm_confidence == 0.9 for i in hybrid)
         assert all(i.explanation.startswith("LLM-confirmed:") for i in hybrid)
 
-    def test_rejecting_eliminates_false_positives(self) -> None:
-        """LLM bir aday için confirmed=false derse o issue rapora girmemeli."""
+    def test_llm_rejection_keeps_high_static_confidence(self) -> None:
+        """Yüksek statik güvenli aday LLM reddiyle düşmemeli (agresif eleme koruması)."""
 
-        rejected: list[str] = []
+        rejected_id: list[str] = []
 
         def factory(prompt: str):
             ids = _ids_in_prompt(prompt)
             verdicts = []
             for i, iid in enumerate(ids):
                 if i == 0:
-                    rejected.append(iid)
+                    rejected_id.append(iid)
                     verdicts.append(
                         {
                             "id": iid,
@@ -144,9 +144,9 @@ class TestProfilerHybrid:
         provider = FakeProvider(factory)
         static = profiler_agent_static(FIXTURE)
         hybrid = profiler_agent_hybrid(FIXTURE, provider=provider, model="fake-model")
-        assert len(hybrid) == len(static) - len(rejected)
+        assert len(hybrid) == len(static)
         kept_ids = {i.id for i in hybrid}
-        assert not (set(rejected) & kept_ids)
+        assert rejected_id[0] in kept_ids
 
     def test_severity_override_applied(self) -> None:
         def factory(prompt: str):

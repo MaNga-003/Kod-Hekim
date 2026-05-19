@@ -1,0 +1,18 @@
+{
+  "issue": {
+    "code": "UNBOUNDED_CACHE",
+    "file": "src/utils/cache.py",
+    "line_start": 8,
+    "line_end": 14,
+    "severity": "high",
+    "explanation": "@cache decoratoru sınırsız büyür — eviction yok.",
+    "impact_summary": "Cache key uzayı geniş ise RAM süresiz büyür. Uzun ömürlü süreçte OOM ile sonlanır."
+  },
+  "code_window": "from functools import cache\n\n@cache\ndef expensive_lookup(query: str) -> dict:\n    rows = db.session.execute(text(query)).fetchall()\n    return [dict(r) for r in rows]",
+  "response": {
+    "fix_instruction_tr": "1. Kök neden: @cache sınırsız anahtar biriktirir; eviction yok.\n2. @cache yerine @lru_cache(maxsize=N) veya harici TTL'li cache (Redis) kullan.\n3. maxsize değerini beklenen benzersiz anahtar sayısına göre belirle.\n4. Uzun ömürlü süreçlerde cache istatistiklerini izle (cache_info).\n5. 1024+ farklı anahtar ile eviction davranışını test et.",
+    "risk_level": 2,
+    "test_suggestion": "1024'ten fazla farklı argümanla çağırıp eski entry'lerin evict edildiğini cacheinfo() ile doğrula.",
+    "improvement_estimate": "Peak RAM sınırı uygulanır; uzun ömürlü süreçlerde sızıntı engellenir."
+  }
+}
