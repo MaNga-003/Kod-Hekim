@@ -36,7 +36,6 @@ export default function LandingPage() {
   const [provider, setProvider] = useState<Provider>("cerebras");
   const [models, setModels] = useState<ModelsResponse | null>(null);
   const [overrides, setOverrides] = useState<ModelMap>({});
-  const [advanced, setAdvanced] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string>("");
 
@@ -128,60 +127,75 @@ export default function LandingPage() {
           </p>
         </header>
 
-        {/* ─── Pazar Etkisi / Jüri Hook ─── */}
+        {/* ─── KodHekim Nedir? ─── */}
         <section
-          aria-label="Pazar etkisi"
-          className="mb-10 rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] p-6 shadow-lg float-up float-up-delay-1"
+          aria-label="KodHekim nedir"
+          className="mb-6 rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] p-6 shadow-lg float-up float-up-delay-1"
         >
+          <h2 className="mb-3 text-lg font-semibold text-[var(--foreground)]">
+            KodHekim Nedir?
+          </h2>
           <p className="text-sm leading-relaxed text-[var(--muted-light)]">
-            <strong className="text-[var(--foreground)]">Gartner</strong>&apos;a göre
-            2024&apos;te global bulut bilişim harcaması{" "}
+            Bulut faturalarının yaklaşık dörtte biri — yılda küresel ölçekte{" "}
+            <strong className="text-[var(--warn)]">183 milyar dolar</strong> —
+            kötü yazılmış kod yüzünden boşa gidiyor; kimse bunu fark etmiyor,
+            çünkü kimse ölçmüyor.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--muted-light)]">
+            <strong className="text-[var(--foreground)]">KodHekim</strong> bu
+            görünmez israfı 2 dakikada raporlayan ilk araç: hangi kod parçasının
+            sunucuyu yorduğunu, faturayı şişirdiğini ve veri merkezinde
+            litrelerce suyu boşa harcadığını tek tek söyler.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-[var(--foreground)]">
+            Yani bizim ürünümüz şirketlere{" "}
+            <em>&ldquo;bilinçsizce yaktıkları parayı&rdquo;</em> gösteriyor — bu,
+            satılmayacak bir ürün değil;{" "}
+            <strong>CTO&apos;ların her sabah açacağı dashboard.</strong>
+          </p>
+        </section>
+
+        {/* ─── Piyasa Analizi ─── */}
+        <section
+          aria-label="Piyasa analizi"
+          className="mb-10 rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] p-6 shadow-lg float-up float-up-delay-2"
+        >
+          <h2 className="mb-3 text-lg font-semibold text-[var(--foreground)]">
+            Piyasa Analizi
+          </h2>
+          <p className="text-sm leading-relaxed text-[var(--muted-light)]">
+            <strong className="text-[var(--foreground)]">Gartner</strong>&apos;a
+            göre 2024&apos;te global bulut bilişim harcaması{" "}
             <strong className="text-accent">679 milyar doları</strong> aştı.{" "}
-            <strong className="text-[var(--foreground)]">Flexera State of the Cloud 2024</strong>{" "}
+            <strong className="text-[var(--foreground)]">
+              Flexera State of the Cloud 2024
+            </strong>{" "}
             raporu, bu harcamanın{" "}
-            <strong className="text-[var(--warn)]">%27&apos;sinin boşa gittiğini</strong>{" "}
+            <strong className="text-[var(--warn)]">
+              %27&apos;sinin boşa gittiğini
+            </strong>{" "}
             — yılda yaklaşık{" "}
             <strong className="text-[var(--warn)]">183 milyar dolarlık</strong>{" "}
             kayıp — ortaya koyuyor. Sebep, çoğu zaman görünmez kalan kötü kod
             örüntüleridir.
           </p>
-
-          <div className="my-4 grid grid-cols-3 gap-3 text-center">
-            <div className="rounded-lg border border-[var(--panel-border)] p-3">
-              <div className="text-xl font-bold text-accent">$1,8 Milyar</div>
-              <div className="text-[11px] text-muted mt-1">
-                yıllık tasarruf (küresel %1 verim)
-              </div>
-            </div>
-            <div className="rounded-lg border border-[var(--panel-border)] p-3">
-              <div className="text-xl font-bold text-[var(--good)]">
-                Milyarlarca L
-              </div>
-              <div className="text-[11px] text-muted mt-1">
-                veri merkezi soğutma suyu
-              </div>
-            </div>
-            <div className="rounded-lg border border-[var(--panel-border)] p-3">
-              <div className="text-xl font-bold text-[var(--violet)]">~%2</div>
-              <div className="text-[11px] text-muted mt-1">
-                BT kaynaklı küresel karbon (IEA)
-              </div>
-            </div>
-          </div>
-
-          <p className="text-sm leading-relaxed text-[var(--muted-light)]">
+          <p className="mt-3 text-sm leading-relaxed text-[var(--muted-light)]">
             Yalnızca Microsoft&apos;un veri merkezleri 2022&apos;de{" "}
-            <strong className="text-[var(--foreground)]">6,4 milyar litre su</strong>{" "}
+            <strong className="text-[var(--foreground)]">
+              6,4 milyar litre su
+            </strong>{" "}
             tüketti; üç büyük bulut sağlayıcısının toplamı{" "}
-            <strong className="text-[var(--foreground)]">20 milyar litreyi</strong>{" "}
-            aşıyor. Bu israfın yalnızca <strong>%1&apos;inin</strong> kurtarılması
-            bile küresel ölçekte yılda{" "}
-            <strong className="text-accent">1,8 milyar dolar</strong> tasarruf ve{" "}
+            <strong className="text-[var(--foreground)]">
+              20 milyar litreyi
+            </strong>{" "}
+            aşıyor. Bu israfın yalnızca <strong>%1&apos;inin</strong>{" "}
+            kurtarılması bile küresel ölçekte yılda{" "}
+            <strong className="text-accent">1,8 milyar dolar</strong> tasarruf
+            ve{" "}
             <strong className="text-[var(--good)]">milyarlarca litre</strong>{" "}
             soğutma suyunun korunması anlamına gelir.
           </p>
-
-          <p className="mt-4 text-sm leading-relaxed text-[var(--foreground)]">
+          <p className="mt-3 text-sm leading-relaxed text-[var(--foreground)]">
             Piyasanın talebi net:{" "}
             <em>
               bu görünmez israfı ölçülebilir, raporlanabilir hale getiren bir
@@ -261,36 +275,31 @@ export default function LandingPage() {
             )}
           </div>
 
-          {/* Gelişmiş Ayarlar */}
+          {/* Gelişmiş Ayarlar — daima görünür */}
           {mode !== "static" && (
             <div className="mt-5">
-              <button
-                type="button"
-                onClick={() => setAdvanced((v) => !v)}
-                className="text-xs text-accent hover:underline transition-colors flex items-center gap-1"
-              >
-                <svg className={`h-3 w-3 transition-transform duration-200 ${advanced ? "rotate-90" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <div className="mb-2 flex items-center gap-2 text-xs text-muted-light font-medium">
+                <svg className="h-3.5 w-3.5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                {advanced ? "Gelişmiş ayarları gizle" : "Gelişmiş: ajan başına model"}
-              </button>
-              {advanced && (
-                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border border-[var(--panel-border)] bg-[var(--panel-2)]">
-                  {(["profiler", "impact", "surgeon", "chief", "deep"] as const).map((agent) => (
-                    <div key={agent}>
-                      <label className="text-[11px] text-muted block mb-1 capitalize font-medium">{agent}</label>
-                      <select
-                        value={overrides[agent] ?? ""}
-                        onChange={(e) => setOverrides({ ...overrides, [agent]: e.target.value })}
-                        className="w-full bg-[var(--input-bg)] border border-[var(--panel-border)] rounded-lg px-3 py-2 text-sm mono text-[var(--foreground)] outline-none focus:border-[var(--accent)] transition"
-                      >
-                        <option value="">varsayılan ({providerDefaults[agent] ?? "?"})</option>
-                        {providerModels.map((m) => (<option key={m} value={m}>{m}</option>))}
-                      </select>
-                    </div>
-                  ))}
-                </div>
-              )}
+                Gelişmiş: ajan başına model
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-xl border border-[var(--panel-border)] bg-[var(--panel-2)]">
+                {(["profiler", "impact", "surgeon", "chief", "deep"] as const).map((agent) => (
+                  <div key={agent}>
+                    <label className="text-[11px] text-muted block mb-1 capitalize font-medium">{agent}</label>
+                    <select
+                      value={overrides[agent] ?? ""}
+                      onChange={(e) => setOverrides({ ...overrides, [agent]: e.target.value })}
+                      className="w-full bg-[var(--input-bg)] border border-[var(--panel-border)] rounded-lg px-3 py-2 text-sm mono text-[var(--foreground)] outline-none focus:border-[var(--accent)] transition"
+                    >
+                      <option value="">varsayılan ({providerDefaults[agent] ?? "?"})</option>
+                      {providerModels.map((m) => (<option key={m} value={m}>{m}</option>))}
+                    </select>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
