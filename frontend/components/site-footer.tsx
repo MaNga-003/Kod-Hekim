@@ -1,6 +1,6 @@
 const DEFAULT_REPO =
   process.env.NEXT_PUBLIC_GITHUB_REPO_URL ??
-  "https://github.com/MaNga-003/KodHekim";
+  "https://github.com/MaNga-003/Kod-Hekim";
 
 function GitHubIcon() {
   return (

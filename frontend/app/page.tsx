@@ -266,6 +266,115 @@ export default function LandingPage() {
           </button>
         </div>
 
+        {/* Jüri / ziyaretçi tanıtım bölümü */}
+        <section
+          aria-label="KodHekim hakkında"
+          className="mt-12 grid gap-6 md:grid-cols-2"
+        >
+          <div className="rounded-xl border border-[var(--panel-border)] bg-[var(--panel)] p-6 shadow-lg">
+            <div className="mb-3 flex items-center gap-2">
+              <span className="text-lg">🚦</span>
+              <h2 className="text-base font-semibold">Analiz Modları</h2>
+            </div>
+            <p className="mb-4 text-xs text-[var(--muted-light)] leading-relaxed">
+              Repoya ne kadar derinlemesine bakılacağını siz seçersiniz. Üç mod,
+              hız ile derinlik arasında farklı bir denge sunar.
+            </p>
+            <ul className="space-y-2.5 text-xs text-[var(--muted-light)]">
+              <li>
+                <strong className="text-[var(--foreground)]">⚡ Statik —</strong>{" "}
+                yalnızca kural motoru çalışır, LLM tüketimi sıfırdır. CI/CD
+                hattına entegre etmek için idealdir.
+              </li>
+              <li>
+                <strong className="text-[var(--foreground)]">🎯 Hibrit (önerilen) —</strong>{" "}
+                kural motoru bulguları AI ajanlarıyla doğrulanır, etkisi ölçülür
+                ve düzeltme reçetesi yazılır. Günlük kullanım için en dengeli
+                seçenek.
+              </li>
+              <li>
+                <strong className="text-[var(--foreground)]">🔬 Derin —</strong>{" "}
+                AST özeti ve kaynak kod doğrudan LLM&apos;e gönderilir,
+                beklenmedik örüntüler tespit edilir. Küçük-orta repolar için
+                önerilir.
+              </li>
+            </ul>
+          </div>
+
+          <div className="rounded-xl border border-[var(--panel-border)] bg-[var(--panel)] p-6 shadow-lg">
+            <div className="mb-3 flex items-center gap-2">
+              <span className="text-lg">🤖</span>
+              <h2 className="text-base font-semibold">LLM Sağlayıcıları</h2>
+            </div>
+            <p className="mb-4 text-xs text-[var(--muted-light)] leading-relaxed">
+              KodHekim iki büyük dil modeli sağlayıcısı ile çalışır. İstediğinizi
+              seçebilir, ya da gelişmiş ayarlardan her ajan için ayrı model
+              atayabilirsiniz.
+            </p>
+            <ul className="space-y-2.5 text-xs text-[var(--muted-light)]">
+              <li>
+                <strong className="text-[var(--foreground)]">⚡ Cerebras —</strong>{" "}
+                Ultra hızlı çıkarım motoru (gpt-oss-120b, qwen, llama, glm-4.7).
+                Pipeline&apos;ı saniyeler içinde tamamlar; canlı demo için
+                önerilir.
+              </li>
+              <li>
+                <strong className="text-[var(--foreground)]">✨ Gemini —</strong>{" "}
+                Google DeepMind&apos;ın 2.5 Pro &amp; Flash modelleri. Daha uzun
+                bağlam ve detaylı muhakeme; karmaşık repolarda tercih edilir.
+              </li>
+            </ul>
+            <p className="mt-4 text-[11px] text-muted">
+              Tüm LLM çağrılarında 90 sn timeout ve deterministik fallback
+              vardır; sağlayıcı yanıtsız kalsa bile rapor üretilir.
+            </p>
+          </div>
+        </section>
+
+        <section
+          aria-label="KodHekim 4 ajan ekibi"
+          className="mt-6 rounded-xl border border-[var(--panel-border)] bg-[var(--panel)] p-6 shadow-lg"
+        >
+          <div className="mb-3 flex items-center gap-2">
+            <span className="text-lg">👨‍⚕️</span>
+            <h2 className="text-base font-semibold">4 Ajan Ekibi</h2>
+          </div>
+          <p className="mb-4 text-xs text-[var(--muted-light)] leading-relaxed">
+            Hibrit ve Derin modlarda dört uzman ajan birbirinin çıktısı üzerine
+            çalışır. Her ajan kendi alanında uzmanlaşmıştır.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 text-xs text-[var(--muted-light)]">
+            <div className="rounded-lg border border-[var(--panel-border)] p-3">
+              <div className="mb-1 font-semibold text-[var(--foreground)]">
+                🔍 Dr. Müfettiş
+              </div>
+              <div>22 örüntüyü tespit eder, statik kuralı LLM ile doğrular.</div>
+            </div>
+            <div className="rounded-lg border border-[var(--panel-border)] p-3">
+              <div className="mb-1 font-semibold text-[var(--foreground)]">
+                📊 Dr. Ölçücü
+              </div>
+              <div>Sorunların teknik etkisini sayısallaştırır (sorgu, RAM, latency).</div>
+            </div>
+            <div className="rounded-lg border border-[var(--panel-border)] p-3">
+              <div className="mb-1 font-semibold text-[var(--foreground)]">
+                🩹 Dr. Cerrah
+              </div>
+              <div>Her bulguya sözel düzeltme reçetesi, risk ve test önerisi yazar.</div>
+            </div>
+            <div className="rounded-lg border border-[var(--panel-border)] p-3">
+              <div className="mb-1 font-semibold text-[var(--foreground)]">
+                ⚕️ Dr. Hekimbaşı
+              </div>
+              <div>Sağlık skoru hesaplar, yönetici özeti hazırlar.</div>
+            </div>
+          </div>
+          <p className="mt-4 text-[11px] text-muted">
+            BTK Akademi Hackathon 2026 — Finans Teması • Açık kaynak, MIT
+            lisanslı, Türkçe arayüz.
+          </p>
+        </section>
+
         <SiteFooter />
       </div>
     </main>
