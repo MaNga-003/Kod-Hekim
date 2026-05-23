@@ -136,8 +136,8 @@ export default function LandingPage() {
             KodHekim Nedir?
           </h2>
           <p className="text-sm leading-relaxed text-[var(--muted-light)]">
-            Bulut faturalarının yaklaşık dörtte biri — yılda küresel ölçekte{" "}
-            <strong className="text-[var(--warn)]">183 milyar dolar</strong> —
+            Bulut faturalarının yaklaşık dörtte biri (yılda küresel ölçekte{" "}
+            <strong className="text-[var(--warn)]">183 milyar dolar</strong>)
             kötü yazılmış kod yüzünden boşa gidiyor; kimse bunu fark etmiyor,
             çünkü kimse ölçmüyor.
           </p>
@@ -174,9 +174,9 @@ export default function LandingPage() {
             <strong className="text-[var(--warn)]">
               %27&apos;sinin boşa gittiğini
             </strong>{" "}
-            — yılda yaklaşık{" "}
+            (yılda yaklaşık{" "}
             <strong className="text-[var(--warn)]">183 milyar dolarlık</strong>{" "}
-            kayıp — ortaya koyuyor. Sebep, çoğu zaman görünmez kalan kötü kod
+            kayıp) ortaya koyuyor. Sebep, çoğu zaman görünmez kalan kötü kod
             örüntüleridir.
           </p>
           <p className="mt-3 text-sm leading-relaxed text-[var(--muted-light)]">

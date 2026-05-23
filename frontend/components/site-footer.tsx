@@ -44,7 +44,7 @@ export function SiteFooter() {
 
       <div className="flex items-center gap-2 text-xs text-muted">
         <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)] opacity-50" />
-        <span>KodHekim · BTK Akademi Hackathon 2026</span>
+        <span>KodHekim · MaNga-003 · BTK Akademi Hackathon 2026</span>
         <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--violet)] opacity-50" />
       </div>
     </footer>
