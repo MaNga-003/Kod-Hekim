@@ -17,7 +17,7 @@ Kötü yazılmış bir döngü, gereksiz veritabanı sorgusu, sınırsız büyü
 ### Çözüm
 Kullanıcı GitHub repo URL'sini yapıştırır. KodHekim'in 4 AI ajanı işbaşı yapar:
 
-1. **Profiler** — Statik kural motoru + LLM ile **23 farklı pahalı/riskli kod örüntüsü** tespit eder (performans, RAM, güvenilirlik, güvenlik, kalite).
+1. **Profiler** — Statik kural motoru + LLM ile **22 farklı pahalı/riskli kod örüntüsü** tespit eder (performans, RAM, güvenilirlik, güvenlik, kalite).
 2. **Etki Analisti** — Her sorunun teknik etkisini ölçer (ekstra DB çağrısı sayısı, bellek sızıntı hızı, latency etkisi, restart riski). Parasal değil, somut teknik veri.
 3. **Cerrah** — Her sorun için **sözel, mantıksal ve adımsal mimari çözüm önerisi** üretir (Türkçe reçete metni; unified diff / kod patch üretmez) + yan etki riski ve test önerisi.
 4. **Hekimbaşı** — Tüm bulguları toplayıp yönetici özetli, tarayıcıdan yazdırılabilir bir kod sağlığı raporu yazar.
@@ -86,7 +86,7 @@ KOBİ Finans Asistanı'nın yazılım versiyonu. Yarışma şartnamesinde "KOBİ
 │                              │                                  │
 │  ┌────────────┐  ┌─────────────┐  ┌──────────────────────────┐ │
 │  │Repo Cloner │  │  AST Parser │  │ Static Rule Engine       │ │
-│  │(gitpython) │  │(ast, tree-  │  │ (23 örüntü plugin)       │ │
+│  │(gitpython) │  │(ast, tree-  │  │ (22 örüntü plugin)       │ │
 │  │            │  │ sitter)     │  │                          │ │
 │  └────────────┘  └─────────────┘  └──────────────────────────┘ │
 │                              │                                  │
@@ -330,8 +330,8 @@ Token tüketimi: ~100K (~50 dosyalı orta boy Python repo).
 2. Her dosya için **özetlenmiş AST + ham kod** çıkar.
    - "Özetlenmiş AST": fonksiyon imzaları + class yapısı + import grafiği + kontrol akışı outline (`backend/analysis/ast_summary.py` tarafından üretilir).
 3. **Tek bir büyük prompt** halinde LLM'e gönder:
-   - Sistem mesajı: "Aşağıdaki repo'da kaynak (CPU/RAM/I/O/güvenlik) tüketen örüntüleri bul. Bilinen 23 örüntü dışında da arayabilirsin."
-   - Eklenecek: 23 örüntü listesi (referans), repo özet AST, *seçilmiş* tam kod dosyaları (en büyük 10 + entry point).
+   - Sistem mesajı: "Aşağıdaki repo'da kaynak (CPU/RAM/I/O/güvenlik) tüketen örüntüleri bul. Bilinen 22 örüntü dışında da arayabilirsin."
+   - Eklenecek: 22 örüntü listesi (referans), repo özet AST, *seçilmiş* tam kod dosyaları (en büyük 10 + entry point).
 4. LLM, kendi belirlediği `code` ile sorunlar üretir (`OTHER_<kebab-case>` kabul edilir).
 5. Üretilen sorunlar `IssueCandidate` formatına dönüştürülür, sonra Etki Analisti + Cerrah + Hekimbaşı **aynı pipeline'a** girer.
 
@@ -393,7 +393,7 @@ Frontend bileşeni: `components/agent-persona.tsx` — avatar (emoji veya SVG), 
 
 ### 4.1 Dr. Müfettiş — Profiler Ajanı
 
-**Görev:** 23 örüntüyü tespit etmek (mod'a göre LLM confirm var/yok).
+**Görev:** 22 örüntüyü tespit etmek (mod'a göre LLM confirm var/yok).
 
 **Girdi:** Repo klasör yolu, dil(ler), analiz modu.
 
@@ -439,7 +439,6 @@ Frontend bileşeni: `components/agent-persona.tsx` — avatar (emoji veya SVG), 
 | Sorun tipi | Ölçülen etki | Ölçüm yöntemi |
 |---|---|---|
 | `N1_QUERY` | Ekstra DB çağrısı / istek | Loop iter × DB call (AST'den) |
-| `MEMORY_LEAK_LISTENER` | Sızıntı/saat tahmini | Listener kayıt frekansı + handler boyutu |
 | `SYNC_IN_ASYNC` | Engellenen event-loop süresi | sleep/blocking call sayısı |
 | `MISSING_INDEX_HINT` | Tahmini full-scan ekstra I/O | Filter sıklığı |
 | `O_N_SQUARED` | Komplekslik (input boyutuna göre) | İç içe loop derinliği |
@@ -579,7 +578,7 @@ def top_priorities(items):
 
 ---
 
-## 5. Tespit Edilen Örüntüler (23 örüntü — Python, JS, TS)
+## 5. Tespit Edilen Örüntüler (22 örüntü — Python, JS, TS)
 
 Kategoriler: **Performans (8)**, **RAM/Bellek (5)**, **Güvenilirlik (4)**, **Güvenlik (1, ayrı UI bölümü)**, **Kalite (5)**.
 
@@ -621,10 +620,6 @@ Her örüntü `StaticRule.languages` ile hangi dillerde aktif olduğunu belirtir
 - **Dil:** Python öncelik, JS.
 
 ### 5.2 RAM / Bellek (5)
-
-#### `MEMORY_LEAK_LISTENER` — Event listener sızıntısı (orta)
-- **Tespit:** `addEventListener` / `on('event')` kaydı var, karşılık gelen `removeListener` / `off` yok; DOM veya EventEmitter birikimi.
-- **Dil:** JavaScript, TypeScript (Node.js EventEmitter dahil).
 
 #### `UNCLOSED_RESOURCE` — Açık kalan resource (düşük)
 - **Tespit:** `open()` / `socket()` var, `with` bloğu içinde değil, `.close()` yok.
@@ -748,7 +743,7 @@ Her örüntü ayrı dosya: `backend/analysis/static_rules/n1_query.py`, `unbound
 - 3 segment toggle: **Mod** (Statik / Hibrit / Derin).
   - **Tooltip (hover / focus):** Kullanıcı imleci bir mod düğmesinin üzerine getirdiğinde, o modun ne işe yaradığını özetleyen bilgi kutucuğu görünür. Bileşen: `frontend/components/mode-tooltip.tsx` (Tailwind `group-hover` + `group-focus-within`).
   - Tooltip içeriği: kısa özet paragraf + **Hız**, **Token**, **Kapsam**, **Doğruluk** satırları.
-  - **Statik:** Yalnızca kural motoru · ⚡⚡⚡ · 0 token · 23 örüntü · orta doğruluk.
+  - **Statik:** Yalnızca kural motoru · ⚡⚡⚡ · 0 token · 22 örüntü · orta doğruluk.
   - **Hibrit** *(varsayılan):* Kural + LLM confirm · ⚡⚡ · ~80K token · 3 ajan · yüksek doğruluk.
   - **Derin:** Kod + AST → LLM · ⚡ · ~500K–900K token · en geniş kapsam · küçük-orta repo.
 - 2 segment toggle: **Sağlayıcı** (Cerebras / Gemini).
@@ -963,7 +958,7 @@ prompts/
 **Yapılacaklar:**
 1. `backend/analysis/ast_parser.py` — Python `ast` + Tree-sitter (`tree-sitter-javascript`, `tree-sitter-typescript`); üç dil için birleşik arayüz.
 2. `backend/analysis/static_rules/base.py` — `StaticRule` arayüzü.
-3. **23 örüntü dosyasını** üç dil kapsamına göre yaz:
+3. **22 örüntü dosyasını** üç dil kapsamına göre yaz:
    - Performans (8): `n1_query`, `sync_in_async`, `missing_index_hint`, `o_n_squared`, `large_payload`, `repeated_compute`, `overfetch_columns`, `missing_timeout`
    - RAM (4): `unclosed_resource`, `unbounded_cache`, `global_accumulator`, `list_over_generator`, `load_full_file` *(toplam 5)*
    - Güvenilirlik (4): `unhandled_exception`, `race_condition`, `deep_recursion`, `mutable_default_arg`
@@ -1342,7 +1337,7 @@ Kod-Hekim/
 
 ### Minimum (mutlaka)
 - Public GitHub linkinden Python, JavaScript ve TypeScript repo analizleri yapılıyor.
-- 23 örüntüden en az 12'si gerçek bir repo'da tespit ediliyor.
+- 22 örüntüden en az 12'si gerçek bir repo'da tespit ediliyor.
 - Etki Analisti her sorun için somut teknik metrik üretiyor (parasal yok).
 - Cerrah en az 1 sorun için anlamlı Türkçe reçete üretiyor.
 - Hekimbaşı: ana sağlık skoru + 3 alt-skor + top 3 öncelik.
