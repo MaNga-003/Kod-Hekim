@@ -124,9 +124,72 @@ export default function LandingPage() {
           </div>
 
           <p className="mt-2 text-[11px] text-muted mono">
-            4 AI ajanı · 23 örüntü · Python, JavaScript, TypeScript
+            4 AI ajanı · 22 örüntü · Python, JavaScript, TypeScript
           </p>
         </header>
+
+        {/* ─── Pazar Etkisi / Jüri Hook ─── */}
+        <section
+          aria-label="Pazar etkisi"
+          className="mb-10 rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] p-6 shadow-lg float-up float-up-delay-1"
+        >
+          <p className="text-sm leading-relaxed text-[var(--muted-light)]">
+            <strong className="text-[var(--foreground)]">Gartner</strong>&apos;a göre
+            2024&apos;te global bulut bilişim harcaması{" "}
+            <strong className="text-accent">679 milyar doları</strong> aştı.{" "}
+            <strong className="text-[var(--foreground)]">Flexera State of the Cloud 2024</strong>{" "}
+            raporu, bu harcamanın{" "}
+            <strong className="text-[var(--warn)]">%27&apos;sinin boşa gittiğini</strong>{" "}
+            — yılda yaklaşık{" "}
+            <strong className="text-[var(--warn)]">183 milyar dolarlık</strong>{" "}
+            kayıp — ortaya koyuyor. Sebep, çoğu zaman görünmez kalan kötü kod
+            örüntüleridir.
+          </p>
+
+          <div className="my-4 grid grid-cols-3 gap-3 text-center">
+            <div className="rounded-lg border border-[var(--panel-border)] p-3">
+              <div className="text-xl font-bold text-accent">$1,8 Milyar</div>
+              <div className="text-[11px] text-muted mt-1">
+                yıllık tasarruf (küresel %1 verim)
+              </div>
+            </div>
+            <div className="rounded-lg border border-[var(--panel-border)] p-3">
+              <div className="text-xl font-bold text-[var(--good)]">
+                Milyarlarca L
+              </div>
+              <div className="text-[11px] text-muted mt-1">
+                veri merkezi soğutma suyu
+              </div>
+            </div>
+            <div className="rounded-lg border border-[var(--panel-border)] p-3">
+              <div className="text-xl font-bold text-[var(--violet)]">~%2</div>
+              <div className="text-[11px] text-muted mt-1">
+                BT kaynaklı küresel karbon (IEA)
+              </div>
+            </div>
+          </div>
+
+          <p className="text-sm leading-relaxed text-[var(--muted-light)]">
+            Yalnızca Microsoft&apos;un veri merkezleri 2022&apos;de{" "}
+            <strong className="text-[var(--foreground)]">6,4 milyar litre su</strong>{" "}
+            tüketti; üç büyük bulut sağlayıcısının toplamı{" "}
+            <strong className="text-[var(--foreground)]">20 milyar litreyi</strong>{" "}
+            aşıyor. Bu israfın yalnızca <strong>%1&apos;inin</strong> kurtarılması
+            bile küresel ölçekte yılda{" "}
+            <strong className="text-accent">1,8 milyar dolar</strong> tasarruf ve{" "}
+            <strong className="text-[var(--good)]">milyarlarca litre</strong>{" "}
+            soğutma suyunun korunması anlamına gelir.
+          </p>
+
+          <p className="mt-4 text-sm leading-relaxed text-[var(--foreground)]">
+            Piyasanın talebi net:{" "}
+            <em>
+              bu görünmez israfı ölçülebilir, raporlanabilir hale getiren bir
+              tanı aracı.
+            </em>{" "}
+            <strong>KodHekim tam olarak bunu yapar.</strong>
+          </p>
+        </section>
 
         {/* ─── Ana Panel ─── */}
         <div className="panel rounded-2xl p-7 glow-accent float-up float-up-delay-1">
