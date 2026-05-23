@@ -7,6 +7,7 @@
   <p>Reponu kaz, performans / RAM / güvenlik / kalite sorunlarını bul, somut tanı raporu çıkar.</p>
 
   <p>
+    <a href="https://frontend-production-5646.up.railway.app/"><strong>🚀 Canlı Demo</strong></a> ·
     <a href="docs/pitch.md">📄 Pitch</a> ·
     <a href="docs/architecture.md">🏗️ Mimari</a> ·
     <a href="developer.md">📘 Geliştirici Dökümanı</a>
@@ -21,9 +22,10 @@
 
 ## ⚡ Hızlı Bakış
 
-KodHekim, GitHub repo URL'sini alıp **4 AI ajan ekibi** ile 23 farklı pahalı/riskli
-kod örüntüsünü tespit eder, teknik etkisini sayısal ölçer, unified diff formatında
-düzeltme önerir ve yazdırılabilir bir kod sağlığı raporu üretir.
+KodHekim, GitHub repo URL'sini alıp **4 AI ajan ekibi** ile 22 farklı pahalı/riskli
+kod örüntüsünü tespit eder, teknik etkisini sayısal ölçer, her bulgu için Türkçe
+**sözel düzeltme reçetesi** (risk + test önerisi dahil) hazırlar ve yazdırılabilir bir
+kod sağlığı raporu üretir.
 
 ```
 Repo sağlık skoru: 62/100
@@ -44,7 +46,7 @@ Düzeltme efor tahmini: ~9 geliştirici saati
 <tr>
   <td align="center"><strong>Landing</strong><br/><sub>URL + mod + sağlayıcı</sub></td>
   <td align="center"><strong>Canlı Analiz</strong><br/><sub>4 ajan + SSE log</sub></td>
-  <td align="center"><strong>Tanı Raporu</strong><br/><sub>Skor + bulgular + diff</sub></td>
+  <td align="center"><strong>Tanı Raporu</strong><br/><sub>Skor + bulgular + reçete</sub></td>
 </tr>
 <tr>
   <td><img src="docs/screenshots/01-landing.png" alt="Landing"/></td>
@@ -57,9 +59,9 @@ Düzeltme efor tahmini: ~9 geliştirici saati
 
 | Ajan | Karakter | Görev |
 |---|---|---|
-| 🔍 Profiler | **Dr. Müfettiş** | 23 örüntüyü statik kural motoruyla + LLM confirm ile bulur (Python, JS, TS) |
+| 🔍 Profiler | **Dr. Müfettiş** | 22 örüntüyü statik kural motoruyla + LLM confirm ile bulur (Python, JS, TS) |
 | 📊 Impact Analyst | **Dr. Ölçücü** | Sorunların teknik etkisini sayısal ölçer (ekstra sorgu, peak RAM, latency) |
-| 🩹 Surgeon | **Dr. Cerrah** | Her sorun için unified diff düzeltme + risk + test önerisi üretir |
+| 🩹 Surgeon | **Dr. Cerrah** | Her sorun için Türkçe sözel düzeltme reçetesi + risk seviyesi + test önerisi üretir |
 | ⚕️ Chief | **Dr. Hekimbaşı** | Tüm bulguları toplar, sağlık skoru hesaplar, yönetici özeti yazar |
 
 ## 🚦 Üç Analiz Modu
@@ -70,7 +72,7 @@ Düzeltme efor tahmini: ~9 geliştirici saati
 | **Hibrit** *(default)* | ⚡⚡ | Kural + LLM confirm + ajan pipeline | Günlük kullanım |
 | **Derin** | ⚡ | AST özeti + tam kod LLM'e direkt | Beklenmedik örüntüler için, küçük-orta repo |
 
-## 🔍 23 Tespit Edilen Örüntü
+## 🔍 22 Tespit Edilen Örüntü
 
 **Diller:** Python · JavaScript · TypeScript
 
@@ -78,7 +80,7 @@ Düzeltme efor tahmini: ~9 geliştirici saati
 `N1_QUERY` · `SYNC_IN_ASYNC` · `MISSING_INDEX_HINT` · `O_N_SQUARED` · `LARGE_PAYLOAD` · `REPEATED_COMPUTE` · `OVERFETCH_COLUMNS` · `MISSING_TIMEOUT`
 
 ### Bellek/RAM (5)
-`MEMORY_LEAK_LISTENER` · `UNCLOSED_RESOURCE` · `UNBOUNDED_CACHE` · `GLOBAL_ACCUMULATOR` · `LIST_OVER_GENERATOR` · `LOAD_FULL_FILE`
+`UNCLOSED_RESOURCE` · `UNBOUNDED_CACHE` · `GLOBAL_ACCUMULATOR` · `LIST_OVER_GENERATOR` · `LOAD_FULL_FILE`
 
 ### Güvenilirlik (4)
 `UNHANDLED_EXCEPTION` · `RACE_CONDITION` · `DEEP_RECURSION` · `MUTABLE_DEFAULT_ARG`
@@ -86,7 +88,7 @@ Düzeltme efor tahmini: ~9 geliştirici saati
 ### Güvenlik (1) — *raporda ayrı bölüm*
 `HARDCODED_SECRET` (AWS, Stripe, GitHub, JWT, connection string, generic key)
 
-### Kalite (5)
+### Kalite (4)
 `INEFFICIENT_STRING_CONCAT` · `CIRCULAR_IMPORT` · `SHADOW_VARIABLE` · `DEAD_CODE`
 
 ## 🛠️ Teknolojiler
@@ -103,7 +105,7 @@ flowchart LR
     User([👤]) --> FE[Next.js 14]
     FE -->|POST /api/analyze| BE[FastAPI]
     BE -.->|SSE| FE
-    BE --> Static[23 statik kural · 3 dil]
+    BE --> Static[22 statik kural · 3 dil]
     BE --> Pipeline[4 Ajan<br/>LangGraph]
     Pipeline --> Cerebras[Cerebras]
     Pipeline --> Gemini[Gemini]
@@ -115,7 +117,7 @@ Detay: [docs/architecture.md](docs/architecture.md)
 
 ### Gereksinimler
 - Python 3.11+
-- Node.js 20+ ve pnpm 9+
+- Node.js 20+ ve npm 10+
 - Git
 - Cerebras ve/veya Gemini API anahtarı
 
@@ -127,16 +129,18 @@ uv sync              # bağımlılıkları kurar, .venv oluşturur
 cp ..\.env.example ..\.env
 # .env içine CEREBRAS_API_KEY ve/veya GEMINI_API_KEY ekle
 .\.venv\Scripts\Activate.ps1
-uvicorn main:app --reload --port 8000
+uvicorn main:app --reload --port 8001
 ```
 
 ### Frontend
 
 ```powershell
 cd frontend
-pnpm install
-pnpm dev             # http://localhost:3000
+npm install
+npm run dev          # http://localhost:3000
 ```
+
+`frontend/.env.local` içinde `NEXT_PUBLIC_API_BASE=http://localhost:8001` olmalı (örnek için bkz. `frontend/.env.example`).
 
 ## ✨ Ek Özellikler
 
@@ -145,7 +149,45 @@ pnpm dev             # http://localhost:3000
 - 🏷️ **GitHub badge** — README'ye eklenebilen `kodhekim score: 78/100` SVG rozeti.
 - 🖨️ **Yazdırılabilir rapor** — `@media print` desteği, tarayıcıdan PDF.
 - 🧠 **LLM düşünme stream'i** — ajan çalışırken canlı log.
-- 📋 **Diff kopyala** — tek tıkla clipboard.
+- 📋 **Reçete kopyala** — tek tıkla Türkçe fix instruction'ı clipboard'a.
+
+## 🚧 Uygulama Kısıtları
+
+> Hackathon MVP'sini stabil tutmak için bilinçli sınırlar koyduk. Hepsi env ile esnetilebilir.
+
+### Repo girişi
+| Kısıt | Değer | Env değişkeni |
+|---|---|---|
+| Repo türü | **Yalnızca public GitHub** (`https://github.com/owner/repo`) | — |
+| Maks. klon boyutu | **100 MB** (klon sonrası dizin) | `MAX_REPO_SIZE_MB` |
+| Maks. taranan dosya | **200** (önce src/app/lib gibi öncelikli klasörler) | `MAX_FILES_TO_SCAN` |
+| Atlanan dizinler | `node_modules`, `.venv`, `dist`, `.next`, `__pycache__`, vendor, build çıktıları | — |
+
+### Dil desteği
+| Dil | Uzantılar |
+|---|---|
+| **Python** | `.py`, `.pyi` |
+| **JavaScript** | `.js`, `.jsx`, `.mjs`, `.cjs` |
+| **TypeScript** | `.ts`, `.tsx` |
+
+Diğer diller (Go, Java, Rust, vb.) **şu an desteklenmiyor** — yeni dil eklemek için `analysis/languages.py` + tree-sitter parser + statik kurallar gerekir.
+
+### LLM pipeline sınırları
+| Aşama | Sınır | Env değişkeni |
+|---|---|---|
+| Profiler LLM confirm — adaylık üst sınırı | **35 bulgu** | `MAX_PROFILER_LLM_CANDIDATES` |
+| Surgeon — reçete üretilen bulgu sayısı | **8** (en yüksek etki skoruna göre) | `MAX_SURGEON_FIXES` |
+| Surgeon — tek LLM çağrısında batch | **4** bulgu | `SURGEON_BATCH_SIZE` |
+| LLM istek zaman aşımı | **90 saniye** | `LLM_REQUEST_TIMEOUT_SEC` |
+
+### Raporlama
+- Skorlama havuzu: en kritik **12** bulgu
+- Raporda gösterilen toplam: en fazla **45** bulgu (kalitenin gürültü kuyruğu kısaltılır)
+- Mod karşılaştırması: yalnızca Hibrit modunda aktif (Statik ve Derin paralel çalıştırılmaz)
+
+### Sağlayıcı bağımlılığı
+- En az **bir** sağlayıcı (`CEREBRAS_API_KEY` veya `GEMINI_API_KEY`) tanımlı olmalı; aksi halde Hibrit/Derin modlar başlamaz, Statik mod LLM olmadan çalışır.
+- Pipeline LLM yanıtsız kalırsa **deterministik heuristic fallback** devreye girer (boş rapor üretmez).
 
 ## 📂 Repo Yapısı
 
@@ -156,7 +198,7 @@ Kod-Hekim/
 ├── backend/          # FastAPI
 │   ├── api/          # analyze, stream, report, models, badge
 │   ├── agents/       # profiler, impact, surgeon, chief, orchestrator
-│   ├── analysis/     # static_rules/ (23 örüntü), scan, ast_parser, js_ts_scan, repo_cloner
+│   ├── analysis/     # static_rules/ (22 örüntü), scan, ast_parser, js_ts_scan, repo_cloner
 │   ├── llm/          # cerebras_provider, gemini_provider, registry
 │   └── prompts/      # ajan başına Türkçe prompt'lar
 ├── docs/             # pitch, architecture, screenshots, logo

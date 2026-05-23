@@ -17,7 +17,7 @@ Kötü yazılmış bir döngü, gereksiz veritabanı sorgusu, sınırsız büyü
 ### Çözüm
 Kullanıcı GitHub repo URL'sini yapıştırır. KodHekim'in 4 AI ajanı işbaşı yapar:
 
-1. **Profiler** — Statik kural motoru + LLM ile **23 farklı pahalı/riskli kod örüntüsü** tespit eder (performans, RAM, güvenilirlik, güvenlik, kalite).
+1. **Profiler** — Statik kural motoru + LLM ile **22 farklı pahalı/riskli kod örüntüsü** tespit eder (performans, RAM, güvenilirlik, güvenlik, kalite).
 2. **Etki Analisti** — Her sorunun teknik etkisini ölçer (ekstra DB çağrısı sayısı, bellek sızıntı hızı, latency etkisi, restart riski). Parasal değil, somut teknik veri.
 3. **Cerrah** — Her sorun için **sözel, mantıksal ve adımsal mimari çözüm önerisi** üretir (Türkçe reçete metni; kod patch/diff üretmez).
 4. **Hekimbaşı** — Tüm bulguları toplayıp yönetici özetli, tarayıcıdan yazdırılabilir bir kod sağlığı raporu yazar.
@@ -84,7 +84,7 @@ KOBİ Finans Asistanı'nın yazılım versiyonu. Yarışma şartnamesinde "KOBİ
 │                              │                                  │
 │  ┌────────────┐  ┌─────────────┐  ┌──────────────────────────┐ │
 │  │Repo Cloner │  │  AST Parser │  │ Static Rule Engine       │ │
-│  │(gitpython) │  │ Python·JS·TS│  │ (23 örüntü plugin)       │ │
+│  │(gitpython) │  │ Python·JS·TS│  │ (22 örüntü plugin)       │ │
 │  │            │  │ ast + tree- │  │                          │ │
 │  │            │  │ sitter      │  │                          │ │
 │  └────────────┘  └─────────────┘  └──────────────────────────┘ │
@@ -333,7 +333,7 @@ def get_provider(name: str) -> LLMProvider:
 
 ## 3. Üç Analiz Modu
 
-**Dil kapsamı:** Üç mod da **Python**, **JavaScript** ve **TypeScript** kaynak dosyalarını analiz eder. Dosya yürüyücü `*.py`, `*.js`, `*.jsx`, `*.ts`, `*.tsx` uzantılarını tarar; repoda birden fazla dil varsa otomatik `mixed` dil modu seçilir. 23 örüntünün hangi dillerde aktif olduğu §5'te `StaticRule.languages` ile belirtilir.
+**Dil kapsamı:** Üç mod da **Python**, **JavaScript** ve **TypeScript** kaynak dosyalarını analiz eder. Dosya yürüyücü `*.py`, `*.js`, `*.jsx`, `*.ts`, `*.tsx` uzantılarını tarar; repoda birden fazla dil varsa otomatik `mixed` dil modu seçilir. 22 örüntünün hangi dillerde aktif olduğu §5'te `StaticRule.languages` ile belirtilir.
 
 ### 3.1 Statik mod
 Yalnızca kural motoru, LLM yok. Hız: 50 dosyalı repo < 5 saniye. Token tüketimi: 0. Python, JS ve TS dosyalarının tamamı statik kurallardan geçer.
@@ -362,8 +362,8 @@ Token tüketimi: ~110K (~50 dosyalı orta boy Python/JS/TS repo).
 2. Her dosya için **özetlenmiş AST + ham kod** çıkar (Python `ast`, JS/TS Tree-sitter).
    - "Özetlenmiş AST": fonksiyon imzaları + class yapısı + import grafiği + kontrol akışı outline (`backend/analysis/ast_summary.py` tarafından üretilir; üç dilde aynı özet şeması).
 3. **Tek bir büyük prompt** halinde LLM'e gönder:
-   - Sistem mesajı: "Aşağıdaki repo'da kaynak (CPU/RAM/I/O/güvenlik) tüketen örüntüleri bul. Bilinen 23 örüntü dışında da arayabilirsin."
-   - Eklenecek: 23 örüntü listesi (referans), repo özet AST, *seçilmiş* tam kod dosyaları (en büyük 10 + entry point).
+   - Sistem mesajı: "Aşağıdaki repo'da kaynak (CPU/RAM/I/O/güvenlik) tüketen örüntüleri bul. Bilinen 22 örüntü dışında da arayabilirsin."
+   - Eklenecek: 22 örüntü listesi (referans), repo özet AST, *seçilmiş* tam kod dosyaları (en büyük 10 + entry point).
 4. LLM, kendi belirlediği `code` ile sorunlar üretir (`OTHER_<kebab-case>` kabul edilir).
 5. Üretilen sorunlar `IssueCandidate` formatına dönüştürülür, sonra Etki Analisti + Cerrah + Hekimbaşı **aynı pipeline'a** girer.
 
@@ -425,7 +425,7 @@ Frontend bileşeni: `components/agent-persona.tsx` — avatar (emoji veya SVG), 
 
 ### 4.1 Dr. Müfettiş — Profiler Ajanı
 
-**Görev:** 23 örüntüyü tespit etmek (mod'a göre LLM confirm var/yok).
+**Görev:** 22 örüntüyü tespit etmek (mod'a göre LLM confirm var/yok).
 
 **Girdi:** Repo klasör yolu, dil(ler) (`python` | `javascript` | `typescript` | `mixed`), analiz modu.
 
@@ -614,7 +614,7 @@ def top_priorities(items):
 
 ---
 
-## 5. Tespit Edilen Örüntüler (23 örüntü — Python, JS, TS)
+## 5. Tespit Edilen Örüntüler (22 örüntü — Python, JS, TS)
 
 Kategoriler: **Performans (8)**, **RAM/Bellek (5)**, **Güvenilirlik (4)**, **Güvenlik (1, ayrı UI bölümü)**, **Kalite (5)**.
 
@@ -773,7 +773,7 @@ Her örüntü ayrı dosya: `backend/analysis/static_rules/n1_query.py`, `unbound
 
 | Mod | Tooltip özeti | Hız | Token | Kapsam | Doğruluk |
 |---|---|---|---|---|---|
-| **Statik** | Yalnızca kural motoru. En hızlı yol; LLM token tüketimi sıfır. CI/CD ve hızlı tarama için ideal. | ⚡⚡⚡ (< 5 sn / ~50 dosya) | 0 | 23 statik örüntü · Python, JS, TS | Orta — beklenmedik örüntüleri kaçırabilir |
+| **Statik** | Yalnızca kural motoru. En hızlı yol; LLM token tüketimi sıfır. CI/CD ve hızlı tarama için ideal. | ⚡⚡⚡ (< 5 sn / ~50 dosya) | 0 | 22 statik örüntü · Python, JS, TS | Orta — beklenmedik örüntüleri kaçırabilir |
 | **Hibrit** *(varsayılan)* | Kural motoru aday bulguları üretir; LLM doğrulama ve etki analizi yapar. Dengeli hız ve doğruluk. | ⚡⚡ (~30–90 sn) | ~110K | Statik kurallar + LLM confirm · 4 ajan | Yüksek — genel kullanım için önerilen |
 | **Derin** | Kaynak kod ve AST doğrudan LLM'e gider. En geniş kapsam; en yavaş ve en pahalı mod. | ⚡ (1–3 dk) | ~500K–900K | Tam kod + AST · beklenmedik örüntü avı | En yüksek bağlam — küçük-orta repolar için |
 - 2 segment toggle: **Sağlayıcı** (Cerebras / Gemini).
@@ -997,7 +997,7 @@ prompts/
 **Yapılacaklar:**
 1. `backend/analysis/ast_parser.py` — Python `ast` + Tree-sitter (`tree-sitter-javascript`, `tree-sitter-typescript`); üç dil için birleşik arayüz.
 2. `backend/analysis/static_rules/base.py` — `StaticRule` + `languages`.
-3. **23 örüntü dosyasını** üç dil kapsamına göre yaz (dil-spesifik kurallar `languages` ile filtrelenir).
+3. **22 örüntü dosyasını** üç dil kapsamına göre yaz (dil-spesifik kurallar `languages` ile filtrelenir).
 4. Her kural için unit test (pozitif + negatif; Python, JS, TS fixture'ları).
 5. `ALL_RULES` registry.
 
@@ -1259,7 +1259,7 @@ Kod-Hekim/
 
 ### Minimum (mutlaka)
 - Public GitHub linkinden Python, JavaScript ve TypeScript repo analizleri yapılıyor.
-- 23 örüntüden en az 12'si gerçek bir repo'da tespit ediliyor.
+- 22 örüntüden en az 12'si gerçek bir repo'da tespit ediliyor.
 - Etki Analisti her sorun için somut teknik metrik üretiyor.
 - Hekimbaşı: ana sağlık skoru + 3 alt-skor + top 3 öncelik.
 - 3 analiz modu çalışıyor.
@@ -1273,7 +1273,7 @@ Kod-Hekim/
 - Canlı deploy erişilebilir.
 
 ### İdeal
-- 23 örüntünün tamamı üç dilde tespit ediliyor.
+- 22 örüntünün tamamı üç dilde tespit ediliyor.
 - Tarayıcı "Yazdır" → temiz PDF.
 - 200+ dosyalı repo 2 dakikada tamamlanıyor.
 - Derin mod anlamlı bulgu üretiyor.
@@ -1330,7 +1330,7 @@ Analiz sonunda Statik/Hibrit/Derin süre, token, bulgu sayısı karşılaştırm
 
 ### 16.5 1-Pager Pitch
 
-`docs/pitch.md` — 4 ajan, 23 örüntü, 3 dil, 3 mod.
+`docs/pitch.md` — 4 ajan, 22 örüntü, 3 dil, 3 mod.
 
 ### 16.6 README.md
 
