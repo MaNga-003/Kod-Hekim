@@ -211,45 +211,77 @@ export default function LandingPage() {
           className="mb-10 rounded-2xl border border-[var(--panel-border)] bg-[var(--panel)] p-6 shadow-lg float-up float-up-delay-3"
         >
           <h2 className="mb-3 text-lg font-semibold text-[var(--foreground)]">
-            Sistem Kısıtları
+            Sistem Kısıtları{" "}
+            <span className="text-sm font-normal text-muted">(demo için)</span>
           </h2>
-          <ul className="space-y-2 text-sm text-[var(--muted-light)]">
+          <ul className="space-y-4 text-sm text-[var(--muted-light)]">
             <li className="flex items-start gap-2">
               <span className="text-accent mt-0.5">•</span>
-              <span>
-                Sadece <strong className="text-[var(--foreground)]">public GitHub</strong> repoları analiz edilebilir
-              </span>
+              <div className="flex-1">
+                <div>
+                  Sadece{" "}
+                  <strong className="text-[var(--foreground)]">
+                    public GitHub
+                  </strong>{" "}
+                  repoları analiz edilebilir
+                </div>
+                <div className="mt-1 text-[11px] text-muted">
+                  Pro hedefi: private repo, GitLab, Bitbucket, Azure DevOps desteği
+                </div>
+              </div>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent mt-0.5">•</span>
-              <span>
-                Maksimum repo boyutu:{" "}
-                <strong className="text-[var(--foreground)]">100 MB</strong>
-              </span>
+              <div className="flex-1">
+                <div>
+                  Maksimum repo boyutu:{" "}
+                  <strong className="text-[var(--foreground)]">100 MB</strong>
+                </div>
+                <div className="mt-1 text-[11px] text-muted">
+                  Pro hedefi: 5 GB&apos;a kadar (büyük monorepo desteği)
+                </div>
+              </div>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent mt-0.5">•</span>
-              <span>
-                Tek seferde taranan dosya sayısı:{" "}
-                <strong className="text-[var(--foreground)]">200</strong>
-              </span>
+              <div className="flex-1">
+                <div>
+                  Tek seferde taranan dosya sayısı:{" "}
+                  <strong className="text-[var(--foreground)]">200</strong>
+                </div>
+                <div className="mt-1 text-[11px] text-muted">
+                  Pro hedefi: 50.000+ dosya (sınırsız akış işleme)
+                </div>
+              </div>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent mt-0.5">•</span>
-              <span>
-                Desteklenen diller:{" "}
-                <strong className="text-[var(--foreground)]">
-                  Python, JavaScript, TypeScript
-                </strong>
-              </span>
+              <div className="flex-1">
+                <div>
+                  Desteklenen diller:{" "}
+                  <strong className="text-[var(--foreground)]">
+                    Python, JavaScript, TypeScript
+                  </strong>
+                </div>
+                <div className="mt-1 text-[11px] text-muted">
+                  Pro hedefi: Go, Java, Rust, C#, C++, PHP, Ruby (10+ dil)
+                </div>
+              </div>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-accent mt-0.5">•</span>
-              <span>
-                Ortalama analiz süresi:{" "}
-                <strong className="text-[var(--foreground)]">30 sn – 3 dk</strong>{" "}
-                (seçilen moda göre değişir)
-              </span>
+              <div className="flex-1">
+                <div>
+                  Ortalama analiz süresi:{" "}
+                  <strong className="text-[var(--foreground)]">
+                    30 sn – 3 dk
+                  </strong>{" "}
+                  (seçilen moda göre değişir)
+                </div>
+                <div className="mt-1 text-[11px] text-muted">
+                  Pro hedefi: büyük repolar için 5 – 15 dk, CI/CD entegrasyonu
+                </div>
+              </div>
             </li>
           </ul>
         </section>
